@@ -24,6 +24,9 @@ public class UserEntity {
     private String userName;
 
     @Column
+    private String firstName;
+
+    @Column
     private String lastName;
 
     @Column
