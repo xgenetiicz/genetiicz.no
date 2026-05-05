@@ -45,4 +45,10 @@ public class UserEntity {
     @Column
     private Role role;
 
+    //this is for admin fields
+    @Column(name =  "secret_key")
+    private String secretKey; //Ideally it thinks this is an byte, where it is but it should be stored as an String so
+                            //it can be read by the URI and qr generator.
+
+
 }

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/auth")
 public class UserController {
 
     //@Autowired is the correct way to use, and this make it easier for me
@@ -25,10 +25,10 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity <String> registerUser(@Valid @RequestBody UserDTO userDTO) {
-        userService.registerUser(userDTO);
+    @PostMapping("/admin")
+    public ResponseEntity <String> registerAdmin(@Valid @RequestBody UserDTO userDTO) {
+        userService.registerAdmin(userDTO);
 
-        return ResponseEntity.ok("User registered Successfully!");
+        return ResponseEntity.ok("Admin registered Successfully!");
     }
 }

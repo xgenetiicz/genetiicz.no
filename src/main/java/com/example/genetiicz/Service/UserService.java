@@ -3,6 +3,7 @@ package com.example.genetiicz.Service;
 
 import com.example.genetiicz.DTO.UserDTO;
 import com.example.genetiicz.Entity.UserEntity;
+import com.example.genetiicz.Enum.Role;
 import com.example.genetiicz.Repository.UserRepository;
 import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ public class UserService {
     }
 
     //userId is by primitive datatype that is Long.
-    public void registerUser(UserDTO userDTO){
+    public void registerAdmin(UserDTO userDTO){
         System.out.println("Hello, welcome to my portofolio page! First create an user so we\n" +
                 "can use this information further!");
 
@@ -27,15 +28,23 @@ public class UserService {
             //Så bruker vi DTO for validering og input fra brukeren.
             //Dette er en egen klasse i ../DTO/UserDTO ved
             //bare bruk av getters/setters med Lombok.
-            UserEntity user = new UserEntity();
+            UserEntity admin = new UserEntity();
 
-            //user.setUserId(userId); //Dette blir ikke satt av input, men auto generert. @GeneratedValue(strategy = GenerationType.IDENTITY)
-            //Gjør dette automatisk!!!
-            user.setFirstName(userDTO.getFirstName());
-            user.setLastName(userDTO.getLastName());
-            user.setEmail(userDTO.getEmail());
-            user.setAge(userDTO.getAge());
+            //I need to have an admin logic where this actually checks for TOTP; Time Based One - Time Password
+            //With google authentication - so need to configure the authentication in google cloud also. done it before
 
-            userRepository.save(user);
+
+
+           //Set the values for the first admin registration
+            if(admin == null) {
+                admin.setFirstName(userDTO.getFirstName());
+                admin.setLastName(userDTO.getLastName());
+                admin.setEmail(userDTO.getEmail());
+                admin.setAge(userDTO.getAge());
+                admin.setRole(Role.ADMIN); // This method will only include the admin role
+                userRepository.save(admin);
+            } else {
+                System.out.println("There exists already an admin, with the name: " + admin);
+            }
     }
 }
