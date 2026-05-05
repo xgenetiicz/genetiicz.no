@@ -51,7 +51,8 @@ public class ProjectService {
        // project.setProjectFile(projectDTO.getProjectFile());
 
         project.getUserEntity().getUserId();
-        project.getUserEntity().getFullName();
+        project.getUserEntity().getFirstName();
+        project.getUserEntity().getLastName();
 
         projectRepository.save(project);
 

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/projects")
+@RequestMapping("/api/project")
 public class ProjectController {
 
     private ProjectService projectService;
@@ -25,7 +25,7 @@ public class ProjectController {
     }
 
     //We use http body param objekt to pass the object and then set values.
-    @PostMapping("/project")
+    @PostMapping("/addproject")
     public ResponseEntity <String> addProject(@Valid @RequestBody ProjectDTO projectDTO) {
         projectService.addProject(projectDTO);
 

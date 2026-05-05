@@ -24,6 +24,9 @@ public class UserEntity {
     private String userName;
 
     @Column
+    private String password;
+
+    @Column
     private String firstName;
 
     @Column
@@ -31,9 +34,6 @@ public class UserEntity {
 
     @Column
     private String email;
-
-    @Column
-    private String fullName;
 
     @Column
     private int age;

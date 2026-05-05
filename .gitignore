@@ -18,6 +18,9 @@ src/main/java/resources
 application.yaml
 .env
 
+### POSTMAN
+.postman/*
+
 
 ### IntelliJ IDEA ###
 .idea
