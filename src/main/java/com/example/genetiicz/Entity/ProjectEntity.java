@@ -22,7 +22,7 @@ public class ProjectEntity {
     @Column
     private String projectDescription;
 
-    @Column
+    @Column(unique = true)
     private String projectURL;
 
 

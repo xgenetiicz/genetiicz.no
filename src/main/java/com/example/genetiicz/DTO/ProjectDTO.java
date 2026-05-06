@@ -16,8 +16,6 @@ public class ProjectDTO {
     //DTO holder datafields, og vi ønsker å ha:
     // projectName, projectDescription osv.
 
-    //
-
     @NotBlank(message = "*Project Name/Title is required*")
     private String projectName; //Title
 
@@ -31,14 +29,11 @@ public class ProjectDTO {
 
     //This is for putting image to the project, so this will reveal as a background image
     //on the cards. The idea is to have projectCards that retrieves this image and set it on the
-    //project card
+    //project card but this needs to be converted to bytes in db.
 
 
     //THE BEST WAY TO DO THIS IS TO MAKE THIS WORK AS AN METHOD public void saveFile() need to look on this later
     //-will do this another time.
    // private MultipartFile projectFile;
-
-    //need to think of this
-    private UserEntity userEntity;
 
 }

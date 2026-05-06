@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/project")
+@RequestMapping("/api/projects")
 public class ProjectController {
 
     private ProjectService projectService;
@@ -29,7 +29,8 @@ public class ProjectController {
     public ResponseEntity <String> addProject(@Valid @RequestBody ProjectDTO projectDTO) {
         projectService.addProject(projectDTO);
 
-        //We return to know if the method is succesfully.
-        return ResponseEntity.ok("Project added succesfully");
+        //We return to know if the method is successfully.
+        return ResponseEntity.ok("Project added successfully and also added\nProject: " + projectDTO.getProjectName()); //reveals project added on Postman. This is just an confirmation
+        // that the request is working as it should.
     }
 }

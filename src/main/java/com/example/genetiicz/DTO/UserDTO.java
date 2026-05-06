@@ -14,21 +14,21 @@ public class UserDTO {
     //DTO HOLDER BARE DATA FIELDS, INGEN CONSTRUCTOR,METODER,INGEN LOGIKK BARE
     //KONTROLLERER DATAFLYTEN OG SETTER INN INPUT VERIDER FRA BRUKER.
 
-    @NotBlank(message = "Username is required*")
+    @NotBlank(message = "*Username is required*")
     private String userName;
 
-    @NotBlank(message = "First Name is required*")
+    @NotBlank(message = "*First Name is required*")
     private String firstName;
 
-    @NotBlank (message = "Last Name is required*")
+    @NotBlank (message = "*Last Name is required*")
     private String lastName;
 
-    @Email (message = "E-mail is required*")
+    @Email (message = "*E-mail is required*")
     private String email;
 
-    @NotBlank(message = "Password is required*")
+    @NotBlank(message = "*Password is required*")
     private String password;
 
-    @Min(value = 0, message = "Age must be positive!")
+    @Min(value = 0, message = "*Age must be positive!")
     private int age;
 }
