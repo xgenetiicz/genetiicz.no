@@ -6,6 +6,8 @@ import com.example.genetiicz.Enum.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDateTime;
 
 @Getter
@@ -39,6 +41,7 @@ public class UserEntity {
     private int age;
 
     @Column
+    @CreationTimestamp
     private LocalDateTime userCreated; //creating a timestamp for when the user got added.
 
     @Enumerated(EnumType.STRING)

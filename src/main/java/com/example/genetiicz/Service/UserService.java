@@ -1,14 +1,13 @@
 package com.example.genetiicz.Service;
 
-
-import com.example.genetiicz.Config.SecurityConfig;
 import com.example.genetiicz.DTO.UserDTO;
 import com.example.genetiicz.Entity.UserEntity;
 import com.example.genetiicz.Enum.Role;
 import com.example.genetiicz.Repository.UserRepository;
-import org.apache.catalina.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -37,6 +36,7 @@ public class UserService {
             //Dette er en egen klasse i ../DTO/UserDTO ved
             //bare bruk av getters/setters med Lombok.
             UserEntity admin = new UserEntity();
+            final Optional <UserEntity> isTheAdmin = userRepository.findByRole(Role.ADMIN);
 
             //I need to have an admin logic where this actually checks for TOTP; Time Based One - Time Password
             //With google authentication - so need to configure the authentication in google cloud also. done it before
@@ -44,16 +44,21 @@ public class UserService {
 
 
            //Set the values for the first admin registration
-            if(!userRepository.existsByRole(Role.ADMIN)) { //This should run when there is NO admins.
+            if(!userRepository.existsByRole(Role.ADMIN)) { //if there doesn't exists any admin, we set the values first and create one.
+                admin.setUserName(userDTO.getUserName());
                 admin.setFirstName(userDTO.getFirstName());
                 admin.setLastName(userDTO.getLastName());
-                admin.setPassword(hashedPass); //and we set it here.
+                admin.setPassword(hashedPass); //and we set it here. this is declared on the start of the method and the passwordEncoder object is retrieved with @Bean.
                 admin.setEmail(userDTO.getEmail());
                 admin.setAge(userDTO.getAge());
+                admin.setUserCreated(LocalDateTime.now()); //this will set the values for timestamp og @CreationTimestamp - and defined as properties in application.yaml
                 admin.setRole(Role.ADMIN); // This method will only include the admin role
                 userRepository.save(admin);
+                System.out.println("Added admin with full name as: " + admin.getFirstName() + " " + admin.getLastName());
+                System.out.println("Username: " + admin.getUserName());
             } else {
-                System.out.println("There exists already an admin, with the name: " + admin);
+                System.out.println("There exists already an admin, with the name: " +  isTheAdmin.get().getFirstName() +  " " + isTheAdmin.get().getLastName()
+                + ", with userId as: " + isTheAdmin.get().getUserId());
             }
     }
 }
