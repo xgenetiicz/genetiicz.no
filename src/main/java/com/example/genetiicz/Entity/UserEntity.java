@@ -7,7 +7,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-
+import org.springframework.format.annotation.DateTimeFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -38,7 +39,7 @@ public class UserEntity {
     private String email;
 
     @Column
-    private int age;
+    private LocalDate birthDate;
 
     @Column
     @CreationTimestamp
@@ -50,8 +51,6 @@ public class UserEntity {
 
     //this is for admin fields
     @Column(name =  "secret_key")
-    private String secretKey; //Ideally it thinks this is an byte, where it is but it should be stored as an String so
-                            //it can be read by the URI and qr generator.
-
+    private String secretKey;
 
 }

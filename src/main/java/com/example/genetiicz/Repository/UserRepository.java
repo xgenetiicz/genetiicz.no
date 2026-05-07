@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
     boolean existsByRole(Role role); //this is a query method so we can check if any user with admin role exists
     Optional <UserEntity> findByRole(Role role); // Set this as optional since the value can just be one, if this would been more it would have been defined as an List instead.
+    boolean existsByEmail (String email);
 }

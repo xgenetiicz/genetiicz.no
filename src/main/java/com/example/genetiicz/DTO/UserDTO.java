@@ -1,13 +1,19 @@
 package com.example.genetiicz.DTO;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
+
 @Setter
 @Getter
+
+@ToString //i want this because i want to print out all the json fields so i can see the post data correctly!
 public class UserDTO {
 
 
@@ -29,6 +35,7 @@ public class UserDTO {
     @NotBlank(message = "*Password is required*")
     private String password;
 
-    @Min(value = 0, message = "*Age must be positive!")
-    private int age;
+    @NotBlank
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")//Jsonformat controls how jackson serializes the date info to the rest API.
+    private String birthDate;
 }

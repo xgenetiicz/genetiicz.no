@@ -1,19 +1,18 @@
 package com.example.genetiicz.Controller;
 
 import com.example.genetiicz.DTO.UserDTO;
-import com.example.genetiicz.Repository.UserRepository;
 import com.example.genetiicz.Service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
+/* we request this mapping always, so we calling for different URIS it is: "/api/users/admin"
+ Later on will we also have one for normal users, and then the URI locator should be as: "/api/users/login"
+ and "/api/users/register".
+* */
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/users") // this is crucial since AuthController cannot have the same requestmapping of UserController.
 public class UserController {
 
     //@Autowired is the correct way to use, and this make it easier for me
@@ -25,10 +24,19 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/admin")
+    @PostMapping("/admin") //and this is the post map where the admin post should be referred to as an URI.
     public ResponseEntity <String> registerAdmin(@Valid @RequestBody UserDTO userDTO) {
         userService.registerAdmin(userDTO);
 
         return ResponseEntity.ok("Admin registered Successfully!");
+    }
+
+    @PostMapping("/user")
+    public ResponseEntity <String> registerUser(@Valid@RequestBody UserDTO userDTO) {
+        if(userService.registerUser(userDTO)) {
+            return ResponseEntity.ok("User registered Succesfully" + "\n" + userDTO.toString());
+        } else {
+            return ResponseEntity.ok("You already have an account on this e-mail: " + userDTO.getEmail());
+        }
     }
 }
