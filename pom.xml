@@ -26,13 +26,18 @@
 		<tag/>
 		<url/>
 	</scm>
+
 	<properties>
 		<java.version>21</java.version>
+        <!--Add JWT token properties-->
+        <jjwt.version>0.11.5</jjwt.version>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>4.0.5</version> <!-- Most usages on this at: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -66,6 +71,7 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
+            <version>42.7.11</version> <!-- application failed to start for not declaring version. latest stable with 0 vulnerabilities.-->
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -108,6 +114,7 @@
 			<artifactId>testcontainers-postgresql</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 		<!--Added lombok for getters and setters - easier to set up -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -134,7 +141,28 @@
             <artifactId>javase</artifactId>
             <version>3.5.3</version>
         </dependency>
-	</dependencies>
+
+        <!-- JWT token dependencies,first API-->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+
+        <!-- JWT token dependencies,then webToken with impl-->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.12.6</version>
+        </dependency>
+
+        <!-- JWT token dependencies,lastly webToken with jackson-->
+        <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-jackson</artifactId>
+        <version>0.11.5</version>
+    </dependency>
+    </dependencies>
 
 	<build>
 		<plugins>
