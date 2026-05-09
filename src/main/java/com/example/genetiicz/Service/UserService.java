@@ -6,7 +6,6 @@ import com.example.genetiicz.Enum.Role;
 import com.example.genetiicz.Repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.awt.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -27,7 +26,7 @@ public class UserService /*implements UserDetailsService*/ {
     }
 
     //userId is by primitive datatype that is Long.
-    public void registerAdmin(UserDTO userDTO){
+    public boolean registerAdmin(UserDTO userDTO){
 
             //Add now the hashedPassword and declare it before we set it in the statements:
             String hashedPass = passwordEncoder.encode(userDTO.getPassword());
@@ -45,10 +44,10 @@ public class UserService /*implements UserDetailsService*/ {
 
 
            //Set the values for the first admin registration
-            if(!userRepository.existsByRole(Role.ADMIN)) { //if there doesn't exists any admin, we set the values first and create one.
-                admin.setUserName(userDTO.getUserName());
+            if(!userRepository.existsByEmail(userDTO.getEmail()) && !userRepository.existsByRole(Role.ADMIN)) { //if there doesn't exists any admin, we set the values first and create one.
                 admin.setFirstName(userDTO.getFirstName());
                 admin.setLastName(userDTO.getLastName());
+                admin.setUserName(userDTO.getUserName());
                 admin.setPassword(hashedPass); //and we set it here. this is declared on the start of the method and the passwordEncoder object is retrieved with @Bean.
                 admin.setEmail(userDTO.getEmail());
                 admin.setBirthDate(LocalDate.now());//We change this also for birthdate.
@@ -57,10 +56,12 @@ public class UserService /*implements UserDetailsService*/ {
                 userRepository.save(admin);
                 System.out.println("Added admin with full name as: " + admin.getFirstName() + " " + admin.getLastName());
                 System.out.println("Username: " + admin.getUserName());
+                return true;
             } else {
                 System.out.println("There exists already an admin, with the name: " +  isTheAdmin.get().getFirstName() +  " " + isTheAdmin.get().getLastName()
                 + ", with userId as: " + isTheAdmin.get().getUserId());
             }
+        return false;
     }
 
     public boolean registerUser(UserDTO userDTO) {
@@ -82,7 +83,7 @@ public class UserService /*implements UserDetailsService*/ {
         LocalDate parsedData = LocalDate.parse(userDTO.getBirthDate(), dayMonthYear);
 
 
-        if(userRepository.existsByEmail(userDTO.getEmail()) && userRepository.existsByRole(Role.USERS)) { //Check if the user exists first always.
+        if(userRepository.existsByEmail(userDTO.getEmail()) || userRepository.existsByUsername(userDTO.getUserName()) && userRepository.existsByRole(Role.USERS)) { //Check if the user exists first always.
             System.out.println("You exists already as an user, try to log in or recover password with mail");
             return false;
         } else {
@@ -97,6 +98,15 @@ public class UserService /*implements UserDetailsService*/ {
             System.out.print("User: " + addUser.getUserName() + " | birthdate: " + addUser.getBirthDate());
             return true;
         }
+
+        /*
+        -------------------------------------------------------------------------------------------------
+        From this section im going to implement the login form, where i need to check if the user is already registered, i can check this by existsByEmail.
+        i need to have one for admin where i check it as optional, and for user i need to have a list where i iterate over the whole list, and check it
+        by unique mail, and username. These are changed now in the Entities.
+        */
+
+
     }
 
     /*This override method, why? there is no parent method of this somewhere else?

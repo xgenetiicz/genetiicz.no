@@ -22,7 +22,7 @@ public class ProjectEntity {
     @Column
     private String projectDescription;
 
-    @Column(unique = true)
+    @Column(unique = true) //one url for one project, can have several also - but each url must be unique.
     private String projectURL;
 
 

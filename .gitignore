@@ -40,3 +40,4 @@ build/
 
 ### VS Code ###
 .vscode/
+/postman/globals/workspace.globals.yaml

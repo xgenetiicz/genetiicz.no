@@ -23,7 +23,7 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;  //Generated value generates an ID for the userId, so it needs to be set as Long.
 
-    @Column
+    @Column(unique = true) //each user must have a unique username, since username is a way of identification without compromising personal details.
     private String userName;
 
     @Column
@@ -35,7 +35,7 @@ public class UserEntity {
     @Column
     private String lastName;
 
-    @Column
+    @Column(unique = true) //ofc one user is connected to one email.
     private String email;
 
     @Column

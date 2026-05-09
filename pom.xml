@@ -37,6 +37,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>4.0.5</version> <!-- Most usages on this at: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -70,6 +71,7 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
+            <version>42.7.11</version> <!-- application failed to start for not declaring version. latest stable with 0 vulnerabilities.-->
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -112,6 +114,7 @@
 			<artifactId>testcontainers-postgresql</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 		<!--Added lombok for getters and setters - easier to set up -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
