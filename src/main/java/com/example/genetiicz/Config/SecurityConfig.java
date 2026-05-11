@@ -1,5 +1,8 @@
 package com.example.genetiicz.Config;
 
+import com.example.genetiicz.DTO.AuthRequestDTO;
+import com.example.genetiicz.Filter.JwtAuthFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -7,14 +10,25 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
+
+    @Autowired
+    private final JwtAuthFilter jwtAuthFilter;
+
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
+        this.jwtAuthFilter = jwtAuthFilter;
+
+    }
+
+
     @Bean
     public PasswordEncoder passwordEncoder() { //this is for example PasswordEncoder passwordEncoder = new PasswordEncoder();
         return new BCryptPasswordEncoder();
@@ -40,19 +54,34 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public AuthenticationManager authenticationManager (UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) throws Exception{
+    /*@Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable());
+        http.authorizeHttpRequests(request -> request.anyRequest().permitAll()); //all requests should be authenticated.
+        http.formLogin(Customizer.withDefaults());//fetched from https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/index.html#servlet-authentication-unpwd
+        http.httpBasic(Customizer.withDefaults());
+
+        return http.build();
+    }/*
+
+
+
+
+
+
+    //@Bean
+    //public AuthenticationManager authenticationManager (UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) throws Exception{
         /* based on: TODO: https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/dao-authentication-provider.html
                      TODO: https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/index.html
         AuthenticationProvider is within AuthenticationManager, and this should call on DaoProvider, who will call on UserDetailsService
         and PasswordEncoder(passwordEncoder) that is BCrypt.
         */
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailsService()); // DaoAuthenticationProvider uses the passwordEncoder.
-        authenticationProvider.setPasswordEncoder(passwordEncoder);
+      //  DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailsService()); // DaoAuthenticationProvider uses the passwordEncoder.
+        //authenticationProvider.setPasswordEncoder(passwordEncoder);
         //TODO: authenticationProvider.s
 
-        return new ProviderManager(authenticationProvider);
-    }
+    // return new ProviderManager(authenticationProvider);
+    // }
 
    /* @Bean
     public UserDetailsService userDetailsService() {

@@ -1,29 +1,28 @@
 package com.example.genetiicz.Controller;
 
 
+import com.example.genetiicz.DTO.AuthRequestDTO;
 import com.example.genetiicz.Service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api")
 public class LoginController {
 
     @Autowired
     private UserService userService;
 
-    @Autowired
-    AuthenticationManager authenticationManager;
+    //@Autowired
+   // private AuthenticationManager authenticationManager;
 
-    public LoginController (UserService userService, AuthenticationManager authenticationManager) {
+    public LoginController (UserService userService) {
         this.userService = userService;
+       // this.authenticationManager = authenticationManager;
     }
 
 
@@ -38,9 +37,9 @@ public class LoginController {
      */
 
 
-   /* @GetMapping("/login")
-    public ResponseEntity Cre(@Valid @RequestBody Jwt) {
-
+    /*@PostMapping("/login")
+    public ResponseEntity Cre(@RequestBody AuthRequestDTO authRequestDTO) {
+        if(userService.loadUserByUsername())
 
         return ResponseEntity.status(200).body("Login successfully"); //TODO: this is a template code, need to see further how i do this.
     }*/

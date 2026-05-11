@@ -31,10 +31,10 @@ public class AuthController {
     and validate this with the payload data, and verify this with the signature i have in properties
     and .env
      */
-    public AuthController (UserService userService, JwtService jwtService) {
+   /* public AuthController (UserService userService, JwtService jwtService) {
         this.userService = userService; //So this particular instance will get the new literal value that is the new object sat, that should which user is trying to authenticate.
         this.jwtService = jwtService; //this will also have the new literal value that is the new object, that should be the token generated.
-    }
+    }*/
 
 
 /*

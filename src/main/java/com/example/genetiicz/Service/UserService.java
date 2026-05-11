@@ -118,7 +118,7 @@ public class UserService implements UserDetailsService {
     // userDTO - which actually made sense for me first.
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        Optional <UserEntity> user = userRepository.findUserByUsername(userName);
+        Optional <UserEntity> user = userRepository.findUserByUserName(userName);
 
         if (user.isEmpty()) {
             throw new UsernameNotFoundException("User not found");

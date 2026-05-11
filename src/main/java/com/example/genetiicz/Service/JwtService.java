@@ -27,8 +27,8 @@ public class JwtService {
     //THE CONSTRUCTOR WILL NOT FETCH THE VALUE FROM APPLICATION.YAML, THAT IS WHY I NEEDED TO USE @Value so Spring
     //AUTOMATICALLY INJECTS IN THE DECLARED String VARIABLE;
 
-    @Value("${jwtSecret}") //needed to import springsecurityAnnotation.
-    private String jwtSecret;
+    @Value("${JWT_SECRET}") //needed to import springsecurityAnnotation.
+    private String JWT_SECRET;
 
 
     //we create the token by datatype String
@@ -51,7 +51,7 @@ public class JwtService {
     }
 
     public SecretKey getSignKey() {
-        byte [] keyBytes = Decoders.BASE64.decode(this.jwtSecret); //the jwtSecret from the application.yaml, gets stored into to keybytes by decoding with base64
+        byte [] keyBytes = Decoders.BASE64.decode(this.JWT_SECRET); //the jwtSecret from the application.yaml, gets stored into to keybytes by decoding with base64
         return Keys.hmacShaKeyFor(keyBytes); //and we return this value so we kan retrieve the getSignKey.
     }
 

@@ -37,5 +37,5 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     /*
     findByUsername will be used with the overridet method from UserDetailsService
      */
-        Optional <UserEntity> findUserByUsername (String userName); //from this it should check the lists by iterating for finding the user
+        Optional <UserEntity> findUserByUserName (String userName); //from this it should check the lists by iterating for finding the user
 }
