@@ -4,6 +4,11 @@ import com.example.genetiicz.DTO.UserDTO;
 import com.example.genetiicz.Entity.UserEntity;
 import com.example.genetiicz.Enum.Role;
 import com.example.genetiicz.Repository.UserRepository;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
@@ -12,7 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @Service
-public class UserService /*implements UserDetailsService*/ {
+public class UserService implements UserDetailsService {
 
     private UserRepository userRepository;//Encapsulation and
     private PasswordEncoder passwordEncoder; //I add the @Bean instead since i want to add the object and not the whole class.
@@ -98,20 +103,31 @@ public class UserService /*implements UserDetailsService*/ {
             System.out.print("User: " + addUser.getUserName() + " | birthdate: " + addUser.getBirthDate());
             return true;
         }
-
-        /*
-        -------------------------------------------------------------------------------------------------
-        From this section im going to implement the login form, where i need to check if the user is already registered, i can check this by existsByEmail.
-        i need to have one for admin where i check it as optional, and for user i need to have a list where i iterate over the whole list, and check it
-        by unique mail, and username. These are changed now in the Entities.
-        */
-
-
     }
 
-    /*This override method, why? there is no parent method of this somewhere else?
+     /*
+     ------------------------------------------------------------------------------------------------
+     From this section im going to implement the login form, where i need to check if the user doesn't have an account, i can check this by existsByEmail.
+     And for user I need to have a list where I iterate over the whole list, and check it
+     by unique mail, and username. These are changed now in the Entities.
+     */
+
+
+    // This override method, why? there is no parent method of this somewhere else?
+    // Solution to this: Found out! This is an interface of Spring Security that expects a return in String, therefore cannot I use
+    // userDTO - which actually made sense for me first.
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return null;
-    }*/
+    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+        Optional <UserEntity> user = userRepository.findUserByUsername(userName);
+
+        if (user.isEmpty()) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        return User.builder() //this builder return the values to the method validateToken so it crosschecks.
+                .username(user.get().getUserName())
+                .password(user.get().getPassword())
+                //authorities expect and GrantedAuthorities
+                .authorities(new SimpleGrantedAuthority(user.get().getRole().name()))
+                .build();
+     }
 }

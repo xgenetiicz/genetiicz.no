@@ -1,10 +1,8 @@
 package com.example.genetiicz.Controller;
 
 
-import com.example.genetiicz.Service.JwtAuthService;
+import com.example.genetiicz.Service.JwtService;
 import com.example.genetiicz.Service.UserService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,7 +21,7 @@ time visiting the page.
 public class AuthController {
 
     //Encaps
-    private JwtAuthService jwtAuthService;
+    private JwtService jwtService;
     private UserService userService;
 
     /*
@@ -33,9 +31,9 @@ public class AuthController {
     and validate this with the payload data, and verify this with the signature i have in properties
     and .env
      */
-    public AuthController (UserService userService, JwtAuthService jwtAuthService ) {
+    public AuthController (UserService userService, JwtService jwtService) {
         this.userService = userService; //So this particular instance will get the new literal value that is the new object sat, that should which user is trying to authenticate.
-        this.jwtAuthService = jwtAuthService; //this will also have the new literal value that is the new object, that should be the token generated.
+        this.jwtService = jwtService; //this will also have the new literal value that is the new object, that should be the token generated.
     }
 
 

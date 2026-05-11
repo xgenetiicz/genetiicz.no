@@ -34,5 +34,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
         @Query("SELECT CASE WHEN COUNT(u) > 0 THEN 'true' ELSE 'false' END FROM UserEntity u WHERE u.userName = ?1")
 
         boolean existsByUsername(String userName); // will check db if user exits by this method,because it's already constrained in db.
-
+    /*
+    findByUsername will be used with the overridet method from UserDetailsService
+     */
+        Optional <UserEntity> findUserByUsername (String userName); //from this it should check the lists by iterating for finding the user
 }
