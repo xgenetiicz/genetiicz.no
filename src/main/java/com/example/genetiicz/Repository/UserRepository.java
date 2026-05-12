@@ -37,5 +37,9 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     /*
     findByUsername will be used with the overridet method from UserDetailsService
      */
-        Optional <UserEntity> findUserByUserName (String userName); //from this it should check the lists by iterating for finding the user
+        Optional <UserEntity> findUserByUserName (String userName); //**don't need this anymore but can keep it until now.**
+    /*
+    findByEmail will be used for UserDetails in UserService! because the token is generated based on email and not on username!
+     */
+    Optional <UserEntity> findByEmail(String email);
 }

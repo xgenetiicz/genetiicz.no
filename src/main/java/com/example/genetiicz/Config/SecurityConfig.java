@@ -1,37 +1,43 @@
 package com.example.genetiicz.Config;
 
-import com.example.genetiicz.DTO.AuthRequestDTO;
 import com.example.genetiicz.Filter.JwtAuthFilter;
+import com.example.genetiicz.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private final JwtAuthFilter jwtAuthFilter;
 
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
+    @Autowired
+    private PasswordConfig passwordConfig;
+
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter, UserService userService, PasswordConfig passwordConfig) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.userService = userService;
+        this.passwordConfig = passwordConfig;
 
-    }
-
-
-    @Bean
-    public PasswordEncoder passwordEncoder() { //this is for example PasswordEncoder passwordEncoder = new PasswordEncoder();
-        return new BCryptPasswordEncoder();
     }
 
 
@@ -46,12 +52,26 @@ public class SecurityConfig {
             http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/user","/api/users/admin", "/api/projects/addproject").permitAll()
+                        .requestMatchers("/api/auth").permitAll()
                         .anyRequest().authenticated()
                 )
-                    .httpBasic(Customizer.withDefaults())
-                    .formLogin(Customizer.withDefaults()); //fetched from https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/index.html#servlet-authentication-unpwd
+                    .sessionManagement(session -> session
+                            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // every request needs to be treated as a new one.
+                    .authenticationProvider(authenticationProvider())
+                    .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.setAllowedOrigins(List.of("https://genetiicz.no", "http://localhost:8080"));
+        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT, DELETE"));
+        corsConfiguration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfiguration);
+        return source;
     }
 
     /*@Bean
@@ -62,31 +82,24 @@ public class SecurityConfig {
         http.httpBasic(Customizer.withDefaults());
 
         return http.build();
-    }/*
+    } */
+
+    //  based on: TODO: https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/dao-authentication-provider.html
+    //           TODO: https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/index.html
 
 
+    @Bean
+    public AuthenticationManager authenticationManager (AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
 
 
-
-
-    //@Bean
-    //public AuthenticationManager authenticationManager (UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) throws Exception{
-        /* based on: TODO: https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/dao-authentication-provider.html
-                     TODO: https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/index.html
-        AuthenticationProvider is within AuthenticationManager, and this should call on DaoProvider, who will call on UserDetailsService
-        and PasswordEncoder(passwordEncoder) that is BCrypt.
-        */
-      //  DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailsService()); // DaoAuthenticationProvider uses the passwordEncoder.
-        //authenticationProvider.setPasswordEncoder(passwordEncoder);
-        //TODO: authenticationProvider.s
-
-    // return new ProviderManager(authenticationProvider);
-    // }
-
-   /* @Bean
-    public UserDetailsService userDetailsService() {
-      //TODO: UserDetailsService userDetails = new User.
-    }*/
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider  authenticationProvider = new DaoAuthenticationProvider(userService);
+        authenticationProvider.setPasswordEncoder(passwordConfig.passwordEncoder());
+        return authenticationProvider;
+    }
 
 
 

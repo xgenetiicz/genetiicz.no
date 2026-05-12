@@ -117,14 +117,15 @@ public class UserService implements UserDetailsService {
     // Solution to this: Found out! This is an interface of Spring Security that expects a return in String, therefore cannot I use
     // userDTO - which actually made sense for me first.
     @Override
-    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        Optional <UserEntity> user = userRepository.findUserByUserName(userName);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException { //i saw that now that when i use extractUsername, it already extract the setSubject(email) that is the email.
+        //since i generate the token based on email,AND NOT USERNAME. so when i am actually extracting, it is extracting the mail and not the username!
+        Optional <UserEntity> user = userRepository.findByEmail(email);
 
         if (user.isEmpty()) {
             throw new UsernameNotFoundException("User not found");
         }
         return User.builder() //this builder return the values to the method validateToken so it crosschecks.
-                .username(user.get().getUserName())
+                .username(user.get().getEmail())
                 .password(user.get().getPassword())
                 //authorities expect and GrantedAuthorities
                 .authorities(new SimpleGrantedAuthority(user.get().getRole().name()))
