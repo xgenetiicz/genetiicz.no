@@ -25,6 +25,9 @@ public class EmailConfig {
         mailSender.setUsername(emailUsername);
         mailSender.setPassword(password);
 
+        /*
+        https://stackoverflow.com/questions/41351540/configure-smtp-host-using-yaml-file-in-spring-boot
+         */
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
@@ -32,7 +35,7 @@ public class EmailConfig {
         props.put("mail.debug", "true");
 
 
-        //return the value of mailsender with the Properties values.
+        //return the value of mailSender with the Properties values.
         return mailSender;
 
     }
