@@ -53,4 +53,12 @@ public class UserEntity {
     @Column(name =  "secret_key")
     private String secretKey;
 
+    //Found out that i need columns now for these two also
+    //verificationCode & verificationCodeExpiresAt
+    @Column
+    private String verificationCode;
+
+    @Column
+    private LocalDateTime verificationCodeExpiresAt;
+    private boolean enabled;
 }

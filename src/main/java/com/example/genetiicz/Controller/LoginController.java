@@ -1,29 +1,58 @@
 package com.example.genetiicz.Controller;
 
 
-import com.example.genetiicz.DTO.AuthRequestDTO;
-import com.example.genetiicz.Service.UserService;
+import com.example.genetiicz.DTO.LoginResponseDTO;
+import com.example.genetiicz.DTO.LoginUserDTO;
+import com.example.genetiicz.DTO.UserDTO;
+import com.example.genetiicz.DTO.VerifyUserDto;
+import com.example.genetiicz.Entity.UserEntity;
+import com.example.genetiicz.Service.AuthService;
+import com.example.genetiicz.Service.JwtService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
 public class LoginController {
 
+
     @Autowired
-    private UserService userService;
+    private AuthService authService;
 
-    //@Autowired
-   // private AuthenticationManager authenticationManager;
+    @Autowired
+    private JwtService jwtService;
 
-    public LoginController (UserService userService) {
-        this.userService = userService;
-       // this.authenticationManager = authenticationManager;
+    //The idea is that UserService will just have CRUD operations.
+
+    //so the registerUsers and auth is now redirected to AuthService Class.
+    public LoginController (AuthService authService, JwtService jwtService) {
+        this.authService = authService;
+        this.jwtService = jwtService;
     }
+
+    @PostMapping("/register")
+    public ResponseEntity<String> register(@Valid @RequestBody UserDTO userDTO, VerifyUserDto verifyUserDto) {
+        boolean registeredUser = authService.registerUser(userDTO,verifyUserDto);
+        if (registeredUser) {
+            return ResponseEntity.status(201).body("User Registered successfully"); //status ok!
+        } else {
+            return ResponseEntity.status(401).body("Not Authorized"); //status should be unauthorized that is 401
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDTO> authenticate(@RequestBody LoginUserDTO loginUserDTO){
+        UserEntity authenticatedUser = authService.authenticate(loginUserDTO);
+        String jwtToken = jwtService.generateToken(authenticatedUser.getEmail());
+        LoginResponseDTO loginResponseDTO = new LoginResponseDTO(jwtToken,jwtService.getExpirationTime());
+        return ResponseEntity.status(201).body(loginResponseDTO);
+    }
+
+
+
 
 
     /*

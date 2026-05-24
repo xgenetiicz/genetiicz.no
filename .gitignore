@@ -15,7 +15,6 @@ target/
 
 ### YAML
 src/main/java/resources
-application.yaml
 .env
 
 ### POSTMAN

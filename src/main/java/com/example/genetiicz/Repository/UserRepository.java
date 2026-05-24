@@ -2,8 +2,10 @@ package com.example.genetiicz.Repository;
 
 import com.example.genetiicz.Entity.UserEntity;
 import com.example.genetiicz.Enum.Role;
+import jakarta.validation.Valid;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
@@ -42,4 +44,11 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     findByEmail will be used for UserDetails in UserService! because the token is generated based on email and not on username!
      */
     Optional <UserEntity> findByEmail(String email);
+
+    /*
+    I think the solution for isEnabled is to have a boolean method to check for verification status
+     */
+
+    @Query("SELECT CASE WHEN u.enabled = true THEN true ELSE false END FROM UserEntity u WHERE u.email = :email")
+    boolean isEnabled(@Param("email") String email);
 }
