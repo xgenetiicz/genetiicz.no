@@ -143,17 +143,19 @@
         </dependency>
 
         <!-- JWT token dependencies,first API-->
+        <!-- Source: https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
-            <version>${jjwt.version}</version>
+            <version>0.13.0</version>
         </dependency>
 
-        <!-- JWT token dependencies,then webToken with impl-->
+        <!-- Source: https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-impl</artifactId>
-            <version>0.12.6</version>
+            <version>0.13.0</version>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- dependency so .env can be read by spring...-->
@@ -163,12 +165,13 @@
             <version>5.1.0</version>
         </dependency>
 
-        <!-- JWT token dependencies,lastly webToken with jackson-->
+        <!-- Source: https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson -->
         <dependency>
-        <groupId>io.jsonwebtoken</groupId>
-        <artifactId>jjwt-jackson</artifactId>
-        <version>0.11.5</version>
-    </dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.13.0</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
 	<build>

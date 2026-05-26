@@ -3,7 +3,7 @@ package com.example.genetiicz.Service;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.lang.Function;
+import java.util.function.Function; //did change this to java.util.function.Function instead of **java: package io.jsonwebtoken.impl.lang does not exist**, cannot rely on broken dependencies.
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
