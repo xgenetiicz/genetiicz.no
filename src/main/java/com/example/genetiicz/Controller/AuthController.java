@@ -40,10 +40,12 @@ public class AuthController {
     }
 
 
+/*
 
     @PostMapping("/token")
     public String generateToken(@RequestBody AuthRequestDTO authRequestDTO) {
         return "";
     }
+*/
 
 }

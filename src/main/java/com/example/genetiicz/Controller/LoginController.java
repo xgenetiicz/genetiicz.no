@@ -15,7 +15,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 public class LoginController {
 
 
@@ -49,6 +49,16 @@ public class LoginController {
         String jwtToken = jwtService.generateToken(authenticatedUser.getEmail());
         LoginResponseDTO loginResponseDTO = new LoginResponseDTO(jwtToken,jwtService.getExpirationTime());
         return ResponseEntity.status(201).body(loginResponseDTO);
+    }
+
+    @PostMapping
+    public ResponseEntity<?>checkVerification(@RequestBody VerifyUserDto verifyUserDto) {
+        try {
+            authService.checkVerification(verifyUserDto);
+            return ResponseEntity.status(201).body("Account verified succesfully");
+        } catch (Exception exception) {
+            return ResponseEntity.badRequest().body(exception.getMessage());
+        }
     }
 
 
