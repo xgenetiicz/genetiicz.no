@@ -70,11 +70,11 @@ public class JwtService {
     }
 
     private Claims extractAllClaims (String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSignKey()) //this is stored as bytes remember in the byte [] keyBytes and we call on the method here so its within our scope.
+        return Jwts.parser() //cannot use parserBuilder anymore since **java: package io.jsonwebtoken.impl.lang does not exist** IT'S DEPRECATED.
+                .verifyWith(getSignKey()) //this is stored as bytes remember in the byte [] keyBytes and we call on the method here so its within our scope.
                 .build()
-                .parseClaimsJws(token)
-                .getBody(); //based on Jws<Claims> the parsed token extract All claims from the body. where this is the .payload. and we sign it.
+                .parseSignedClaims(token)
+                .getPayload(); //based on Jws<Claims> the parsed token extract All claims from the body. where this is the .payload. and we sign it.
     }
 
     private Boolean isTokenExpired (String token) {
