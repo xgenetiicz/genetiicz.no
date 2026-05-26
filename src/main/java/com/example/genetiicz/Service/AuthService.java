@@ -7,6 +7,7 @@ import com.example.genetiicz.Entity.UserEntity;
 import com.example.genetiicz.Enum.Role;
 import com.example.genetiicz.Repository.UserRepository;
 import jakarta.mail.MessagingException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +22,9 @@ import java.util.Random;
 @Service
 public class AuthService {
 
+    //Im testing here for the
+    @Value("${MAIL_USERNAME}")
+    private String emailUsername;
 
     private EmailService emailService;
     private UserRepository userRepository;
@@ -173,7 +177,9 @@ public class AuthService {
                 + "</html>";
 
         try {
-            emailService.sendVerificationEmail(user.getEmail(), subject, htmlMessage);
+            emailService.sendVerificationEmail(emailUsername,user.getEmail(), subject, htmlMessage); //I inject the fourth or first parameter with my emailUsername that contains the mail i am sending from.
+            // Because when i setFrom(from) helper with MimeMessageHelper, i need also a parameter here, and this method actually builds and send the verificationEmail. So I am explicitly telling
+            // that
         } catch (MessagingException e) {
             // Handle email sending exception
             e.printStackTrace();

@@ -34,7 +34,7 @@ public class LoginController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@Valid @RequestBody UserDTO userDTO, VerifyUserDto verifyUserDto) {
+    public ResponseEntity<String> registerUser(@Valid @RequestBody UserDTO userDTO, VerifyUserDto verifyUserDto) {
         boolean registeredUser = authService.registerUser(userDTO,verifyUserDto);
         if (registeredUser) {
             return ResponseEntity.status(201).body("User Registered successfully"); //status ok!
@@ -48,7 +48,12 @@ public class LoginController {
         UserEntity authenticatedUser = authService.authenticate(loginUserDTO);
         String jwtToken = jwtService.generateToken(authenticatedUser.getEmail());
         LoginResponseDTO loginResponseDTO = new LoginResponseDTO(jwtToken,jwtService.getExpirationTime());
-        return ResponseEntity.status(201).body(loginResponseDTO);
+        if(authenticatedUser.isEnabled()) {
+            return ResponseEntity.status(201).body(loginResponseDTO);
+        } else {
+            throw new RuntimeException("Email: " + authenticatedUser.getEmail() + ",Is not Authorized");
+        }
+
     }
 
     @PostMapping("/verify")

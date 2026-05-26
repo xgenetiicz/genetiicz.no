@@ -14,6 +14,12 @@ spring:
     port: 587
     username: ${MAIL_USERNAME}
     password: ${MAIL_PASSWORD}
+    properties.mail.smtp:
+      auth: true
+      starttls: true
+      debug: true
+      enable: true
+      required: true #I don't really need all these properties since they are set in the emailConfig, but i'll just leave it here for further development or changes later.
 
 jwt:
   secret: ${JWT_SECRET}
