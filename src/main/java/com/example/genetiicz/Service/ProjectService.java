@@ -11,6 +11,7 @@ import com.example.genetiicz.Repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 
+import javax.management.relation.RoleNotFoundException;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -33,8 +34,8 @@ public class ProjectService {
 
     //I want to add method for actual setting values for Project with DTO.
 
-    public void addProject(ProjectDTO projectDTO) {
-        //Want to print first how the user can actually add - for later implementationn
+    public void addProject(ProjectDTO projectDTO, String email) throws RoleNotFoundException {
+        //Want to print first how the user can actually add - for later implementation
         System.out.println("Click on '+ Add Project'\n So you can add the desired project!");
         //there is a generatedValue so we don't need to set the id for the project
         //This is the same as user, but here we do this for project instead.
@@ -47,11 +48,11 @@ public class ProjectService {
 
         //I need also to create a new object where i can map the user
         //to the correct project. *I have this by optional now in UserRepository*
-        Optional <UserEntity> projectAdmin = userRepository.findByRole(Role.ADMIN);
+        Optional <UserEntity> projectAdmin = userRepository.findByRoleAndEmail(Role.ADMIN,email);
 
         if (!projectAdmin.isPresent()) { // i think the best way is an boolean to check if the presence is there so i can then map the project to the admin
-            throw new RuntimeException("There is no Admin present at all!!!");
-        } else {
+            throw new RuntimeException("*There is no ADMIN present at all*" + userRepository.findByRoleAndEmail(Role.USERS, email));
+        } else if(userRepository.existsByRole(Role.ADMIN)) {
             //these are the values that will be stored in the object.
             project.setProjectName(projectDTO.getProjectName());
             project.setProjectDescription(projectDTO.getProjectDescription());
@@ -64,6 +65,8 @@ public class ProjectService {
             projectRepository.save(project);
             System.out.print("Admin added: "  + projectAdmin.get().getFirstName() + " " + projectAdmin.get().getLastName() + "\n" +
                     "Project: " + project.getProjectName() + "\n " + project.getProjectDescription() + "\n " + project.getProjectURL());
+        } else {
+            throw new RoleNotFoundException("There are no Roles fetched, but Admin should have been fetched for method addProject(ProjectDTO projectDTO)");
         }
     }
 }

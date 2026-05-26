@@ -1,5 +1,6 @@
 package com.example.genetiicz.Config;
 
+import com.example.genetiicz.Enum.Role;
 import com.example.genetiicz.Filter.JwtAuthFilter;
 import com.example.genetiicz.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,8 @@ public class SecurityConfig {
             http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        //Making changes to add ADMIN VERIFICATION if it is present so just I can add projects
+                        .requestMatchers("/api/projects/addproject").hasAuthority(String.valueOf(Role.ADMIN))
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )

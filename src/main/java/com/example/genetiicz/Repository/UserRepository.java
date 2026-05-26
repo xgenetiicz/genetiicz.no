@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
@@ -19,9 +20,14 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     /*
     Optional Method is only for checking the Admin role, since there should be not more than 1 ADMIN, and this is why I chose optional.
+    And also changed this to actually involve the email also, to represent the user by the role.
+     */
+        Optional <UserEntity> findByRoleAndEmail(Role role,String email);
+
+     /*
+    Optional Method is only for checking the Admin role, since there should be not more than 1 ADMIN, and this is why I chose optional.
      */
         Optional <UserEntity> findByRole(Role role);
-
 
     /*
     existByEmail will check user and admin by email, where this is unique and constrained to one.
