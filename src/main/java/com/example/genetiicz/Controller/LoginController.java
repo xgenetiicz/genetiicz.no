@@ -51,7 +51,7 @@ public class LoginController {
         return ResponseEntity.status(201).body(loginResponseDTO);
     }
 
-    @PostMapping
+    @PostMapping("/verify")
     public ResponseEntity<?>checkVerification(@RequestBody VerifyUserDto verifyUserDto) {
         try {
             authService.checkVerification(verifyUserDto);
