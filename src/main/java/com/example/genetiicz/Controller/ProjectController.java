@@ -35,7 +35,7 @@ public class ProjectController {
         projectService.addProject(projectDTO,email);
 
         //We return to know if the method is successfully.
-        return ResponseEntity.ok("Project added successfully and also added\nProject: " + projectDTO.getProjectName()); //reveals project added on Postman. This is just an confirmation
+        return ResponseEntity.status(201).body("Project added successfully and also added\nProject: " + projectDTO.getProjectName()); //reveals project added on Postman. This is just an confirmation
         // that the request is working as it should.
     }
 }

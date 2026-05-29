@@ -11,7 +11,6 @@ import com.example.genetiicz.Service.JwtService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -33,13 +32,24 @@ public class LoginController {
         this.jwtService = jwtService;
     }
 
+
+    @PostMapping("/admin")
+    public ResponseEntity<String> registerAdmin(@Valid @RequestBody UserDTO userDTO, VerifyUserDto verifyUserDto){
+        boolean registeredAdmin = authService.registerAdmin(userDTO,verifyUserDto);
+        if(registeredAdmin) {
+                return ResponseEntity.status(201).body("Admin Registered Successfully");
+            } else {
+                return ResponseEntity.status(409).body("Admin already exists");
+        }
+    }
+
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@Valid @RequestBody UserDTO userDTO, VerifyUserDto verifyUserDto) {
         boolean registeredUser = authService.registerUser(userDTO,verifyUserDto);
         if (registeredUser) {
-            return ResponseEntity.status(201).body("User Registered successfully"); //status ok!
-        } else {
-            return ResponseEntity.status(401).body("Not Authorized"); //status should be unauthorized that is 401
+                return ResponseEntity.status(201).body("User Registered successfully"); //status ok!
+            } else {
+                return ResponseEntity.status(409).body("User already exists"); //status should be unauthorized that is 401 -- EDIT NO: THIS SHOULD BE A BAD REQUEST OR SOMETHING THAT EXPLICTLY THAT THIS REQUEST CANNOT BE DONE.
         }
     }
 
@@ -60,16 +70,11 @@ public class LoginController {
     public ResponseEntity<?>checkVerification(@RequestBody VerifyUserDto verifyUserDto) {
         try {
             authService.checkVerification(verifyUserDto);
-            return ResponseEntity.status(201).body("Account verified succesfully");
+            return ResponseEntity.status(201).body("Account verified successfully");
         } catch (Exception exception) {
             return ResponseEntity.badRequest().body(exception.getMessage());
         }
     }
-
-
-
-
-
     /*
 
     CHECK THESE LINKS FOR AUTH IMPLEMENT OF JWT TOKEN:

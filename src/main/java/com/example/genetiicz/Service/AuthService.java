@@ -32,7 +32,6 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
 
 
-
     public AuthService(EmailService emailService,
                        UserRepository userRepository,
                        AuthenticationManager authenticationManager,
@@ -58,6 +57,64 @@ public class AuthService {
 
      */
 
+    //userId is by primitive datatype that is Long.
+
+    public boolean registerAdmin(UserDTO userDTO, VerifyUserDto verifyUserDto) throws SecurityException{
+        /*
+        I want to check if the method is initialized at all.
+        Because right now, NOTHING IS HAPPENING, NOR EXCEPTION IS CALLED OUT.
+        so there is something failing silently and I don't know what is happening.
+         */
+
+        //Add now the hashedPassword and declare it before we set it in the statements:
+        String hashedPass = passwordEncoder.encode(userDTO.getPassword());
+
+        //parsedData
+        DateTimeFormatter dayMonthYear = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDate parsedData = LocalDate.parse(userDTO.getBirthDate(), dayMonthYear);
+
+        //Lager et nytt objekt i heap memory av user
+        //Så bruker vi DTO for validering og input fra brukeren.
+        //Dette er en egen klasse i ../DTO/UserDTO ved
+        //bare bruk av getters/setters med Lombok.
+        UserEntity admin = new UserEntity();
+        //Optional<UserEntity> doesAdminExists = userRepository.findByRoleAndEmail(Role.ADMIN,userDTO.getEmail());
+
+        //I need to have an admin logic where this actually checks for TOTP; Time Based One - Time Password
+        //With google authentication - so need to configure the authentication in google cloud also.
+
+
+
+        //Set the values for the first admin registration
+        // The idea is still to check the statement with boolean methods for true or false,
+        //so both needs to be true -> by this where the Admin does not exists by mail or as the correct Role.
+        if(!userRepository.existsByEmail(userDTO.getEmail()) && !userRepository.existsByRole(Role.ADMIN)) { //if there doesn't exists any admin, we set the values first and create one.
+            try {
+                System.out.println("It's actually trying to set values for the new admin");
+                admin.setFirstName(userDTO.getFirstName());
+                admin.setLastName(userDTO.getLastName());
+                admin.setUserName(userDTO.getUserName());
+                admin.setPassword(hashedPass); //and we set it here. this is declared on the start of the method and the passwordEncoder object is retrieved with @Bean.
+                admin.setEmail(userDTO.getEmail());
+                admin.setBirthDate(parsedData);//We change this also for birthdate.
+                admin.setUserCreated(LocalDateTime.now()); //this will set the values for timestamp og @CreationTimestamp - and defined as properties in application.yaml
+                admin.setRole(Role.ADMIN); // This method will only include the admin role
+                admin.setVerificationCode(generateVerificationCode());
+                admin.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
+                admin.setEnabled(false);
+                sendVerificationEmail(admin); //important
+                userRepository.save(admin);
+                System.out.println("Added admin with full name as: " + admin.getFirstName() + " " + admin.getLastName());
+                System.out.println("Username: " + admin.getUserName());
+                return true;
+            } catch (Exception exception) {
+                throw new IllegalStateException("User is not authorized as Admin",exception);
+            }
+        }
+        System.out.println("The method did return false, not an exception");
+        return false;
+    }
+
     public boolean registerUser (UserDTO userDTO, VerifyUserDto verifyUserDto) {
         //We store Bcrypt encoding in a String as hashedPassword
         String hashedPassword = passwordEncoder.encode(userDTO.getPassword());
@@ -80,7 +137,7 @@ public class AuthService {
 
         if(userRepository.existsByEmail(userDTO.getEmail()) || userRepository.existsByUsername(userDTO.getUserName()) && userRepository.existsByRole(Role.USERS)) { //Check if the user exists first always.
             System.out.println("You exists already as an user, try to log in or recover password with mail");
-            return userRepository.existsByEmail(userDTO.getEmail());
+            return false;
 
         } else {
             addUser.setFirstName(userDTO.getFirstName());
@@ -115,7 +172,7 @@ public class AuthService {
                 throw new RuntimeException("Account not verified. Please verify your account");
             }
         } else {
-            throw new RuntimeException("Check authenticate, there are no authentication going on Login in AuthService.");
+            throw new RuntimeException("Check authenticate, there are no authentication going on Login in AuthService." + authenticateUser);
         }
     }
 
@@ -162,11 +219,11 @@ public class AuthService {
 
     private void sendVerificationEmail(UserEntity user) { //TODO: Update with company logo
         String subject = "Account Verification";
-        String verificationCode = "VERIFICATION CODE " + user.getVerificationCode();
+        String verificationCode = "VERIFICATION CODE: " + user.getVerificationCode();
         String htmlMessage = "<html>"
                 + "<body style=\"font-family: Arial, sans-serif;\">"
                 + "<div style=\"background-color: #f5f5f5; padding: 20px;\">"
-                + "<h2 style=\"color: #333;\">Welcome to our app!</h2>"
+                + "<h2 style=\"color: #333;\">Welcome to genetiicz.no!</h2>"
                 + "<p style=\"font-size: 16px;\">Please enter the verification code below to continue:</p>"
                 + "<div style=\"background-color: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">"
                 + "<h3 style=\"color: #333;\">Verification Code:</h3>"
