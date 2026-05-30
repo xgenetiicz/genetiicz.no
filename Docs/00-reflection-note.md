@@ -38,4 +38,4 @@ It's like driving a manual car but not knowing when or how to switch gears at th
 ---
 
 *This is just a reflection note, and this is solely based on my experience and opinion on how I did learn. This is not
-a "You should do this or this is right, or wrong", but just purely based on what I felt in that time being stuck in tutorial hell and copy/pasting generated code.*
+a "You should do this or this is right, or wrong", but just purely based on what I felt in that time being stuck, and not learning as I should do.*
