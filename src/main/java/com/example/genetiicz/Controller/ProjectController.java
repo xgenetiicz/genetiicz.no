@@ -2,20 +2,15 @@ package com.example.genetiicz.Controller;
 
 
 import com.example.genetiicz.DTO.ProjectDTO;
-import com.example.genetiicz.DTO.UserDTO;
 import com.example.genetiicz.Service.ProjectService;
 import jakarta.validation.Valid;
-import org.apache.catalina.User;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.management.relation.RoleNotFoundException;
+import javax.security.auth.login.AccountNotFoundException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -37,5 +32,18 @@ public class ProjectController {
         //We return to know if the method is successfully.
         return ResponseEntity.status(201).body("Project added successfully and also added\nProject: " + projectDTO.getProjectName()); //reveals project added on Postman. This is just an confirmation
         // that the request is working as it should.
+    }
+
+    @GetMapping("/fetchProjects")
+    //This is the first time I am implementing a @GetMapping,but I want to validate it with @RequestParam
+    //because this pass the email as query parameter to a dedicated validation endpoint that queries with the database
+
+    public ResponseEntity<List> getAllProjects(@RequestParam String email) throws AccountNotFoundException {
+        List<ProjectDTO> fetchedProjects = projectService.getAllProjects(email);
+        if(fetchedProjects.isEmpty()) {
+            return ResponseEntity.status(404).build();
+        } else {
+            return ResponseEntity.status(200).body(fetchedProjects);
+        }
     }
 }

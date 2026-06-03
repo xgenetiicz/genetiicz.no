@@ -4,7 +4,19 @@ import com.example.genetiicz.Entity.ProjectEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
 
+    /*
+    So the method is written as a List of course, since i want to fetch all the projects
+    made by a user -> in this case admin. But there will be changes later when scaling,
+    there is a plan for that.
+
+    So I want to find ALL PROJECTS, by userId since I have ManyToOne and a JoinColumn on user_id.
+    So i want jpa to find the UserId that is requested, but also filter it on the specific email that
+    the userId is assigned to. Because each EMAIL is = unique. So one email can be part of a project.
+     */
+    List<ProjectEntity> findAllByUserEntity_Email(String email);
 }

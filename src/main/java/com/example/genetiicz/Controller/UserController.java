@@ -50,8 +50,6 @@ public class UserController {
         /*} else if (userService.registerUser(userDTO)) {
             return ResponseEntity.status(403).body("unauthorized access");
         */} else {
-
-
             return ResponseEntity.status(409).body("You already have an account with e-mail: " + userDTO.getEmail() + " & "  + "Username: " + userDTO.getUserName());
         }
     }

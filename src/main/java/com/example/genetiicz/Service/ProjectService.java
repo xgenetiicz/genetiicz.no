@@ -2,7 +2,6 @@ package com.example.genetiicz.Service;
 
 
 import com.example.genetiicz.DTO.ProjectDTO;
-import com.example.genetiicz.DTO.UserDTO;
 import com.example.genetiicz.Entity.ProjectEntity;
 import com.example.genetiicz.Entity.UserEntity;
 import com.example.genetiicz.Enum.Role;
@@ -12,8 +11,12 @@ import org.springframework.stereotype.Service;
 
 
 import javax.management.relation.RoleNotFoundException;
+import javax.security.auth.login.AccountNotFoundException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjectService {
@@ -67,6 +70,37 @@ public class ProjectService {
                     "Project: " + project.getProjectName() + "\n " + project.getProjectDescription() + "\n " + project.getProjectURL());
         } else {
             throw new RoleNotFoundException("There are no Roles fetched, but Admin should have been fetched for method addProject(ProjectDTO projectDTO)");
+        }
+    }
+
+    //Now i want to feth all projects for myself, so i can display this later in a frontend page.
+    public List<ProjectDTO> getAllProjects(String email) throws AccountNotFoundException {
+        List<ProjectEntity> projectEntity = projectRepository.findAllByUserEntity_Email(email);
+
+        //I want to actually have this statement check with an inverted logic, if projectEntity is not Empty,
+        //I want then to stream and map all the objects and place them In a new list with collection.
+        if(!projectEntity.isEmpty()) {
+            //so if the entity is NOT EMPTY, It should return a new list of map with collection of the new list
+            return projectEntity.stream().map(
+                            project -> {
+                                ProjectDTO projectDTO = new ProjectDTO();
+                                projectDTO.setProjectName(project.getProjectName());
+                                projectDTO.setProjectDescription(project.getProjectDescription());
+                                projectDTO.setProjectURL(project.getProjectURL());
+                                return projectDTO;
+                            }).collect(Collectors.toList());
+        }
+        //I need to also check if the project list is actually empty,
+        boolean accountExists = userRepository.existsByEmail(email);
+
+        //then I want to throw the Exception State.
+        if(!accountExists){
+            throw new AccountNotFoundException("Did not find associated account for the projects.");
+            //else this user doesn't have any projects associated with the account
+        } else {
+            System.out.println("User has no projects available with the associated account");
+            //and the returned value of the else statement should include the Collection of the empty list.
+            return Collections.emptyList();
         }
     }
 }
