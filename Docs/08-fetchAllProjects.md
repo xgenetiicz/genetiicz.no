@@ -59,5 +59,5 @@ public List<ProjectDTO> getAllProjects(String email) throws AccountNotFoundExcep
 ```java
 import org.springframework.http.ResponseEntity;
 
-ResponseEntity.status(201).body(fetchedProjects) //fetchedprojects refer to the List retrieved. So the first statement check has an inverted logic.
+ResponseEntity.status(200).body(fetchedProjects) //fetchedprojects refer to the List retrieved. So the first statement check has an inverted logic.
 ```
