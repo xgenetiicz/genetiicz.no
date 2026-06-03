@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 
-//AuthRequestDTO will set the values so i can generate a valid JWT token for the Admin or user.
+//AuthRequestDTO will set the values so I can generate a valid JWT token for the Admin or user.
 public class AuthRequestDTO {
 
     @NotBlank(message = "*Username is required for verification*")
