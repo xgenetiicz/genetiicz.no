@@ -77,16 +77,6 @@ public class SecurityConfig {
         return source;
     }
 
-    /*@Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable());
-        http.authorizeHttpRequests(request -> request.anyRequest().permitAll()); //all requests should be authenticated.
-        http.formLogin(Customizer.withDefaults());//fetched from https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/index.html#servlet-authentication-unpwd
-        http.httpBasic(Customizer.withDefaults());
-
-        return http.build();
-    } */
-
     //  based on: TODO: https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/dao-authentication-provider.html
     //           TODO: https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/index.html
 
@@ -103,8 +93,4 @@ public class SecurityConfig {
         authenticationProvider.setPasswordEncoder(passwordConfig.passwordEncoder());
         return authenticationProvider;
     }
-
-
-
-
 }

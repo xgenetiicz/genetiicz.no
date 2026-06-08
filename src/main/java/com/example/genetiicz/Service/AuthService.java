@@ -6,13 +6,19 @@ import com.example.genetiicz.DTO.VerifyUserDto;
 import com.example.genetiicz.Entity.UserEntity;
 import com.example.genetiicz.Enum.Role;
 import com.example.genetiicz.Repository.UserRepository;
+import jakarta.mail.AuthenticationFailedException;
 import jakarta.mail.MessagingException;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.session.SessionAuthenticationException;
 import org.springframework.stereotype.Service;
-
+import javax.security.auth.login.AccountNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -22,7 +28,7 @@ import java.util.Random;
 @Service
 public class AuthService {
 
-    //Im testing here for the
+    //Injecting .env values into application.yaml and adding the value here.
     @Value("${MAIL_USERNAME}")
     private String emailUsername;
 
@@ -99,7 +105,7 @@ public class AuthService {
                 admin.setBirthDate(parsedData);//We change this also for birthdate.
                 admin.setUserCreated(LocalDateTime.now()); //this will set the values for timestamp og @CreationTimestamp - and defined as properties in application.yaml
                 admin.setRole(Role.ADMIN); // This method will only include the admin role
-                admin.setVerificationCode(generateVerificationCode());
+                admin.setVerificationCode(generateCode());
                 admin.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
                 admin.setEnabled(false);
                 sendVerificationEmail(admin); //important
@@ -147,7 +153,7 @@ public class AuthService {
             addUser.setPassword(hashedPassword);
             addUser.setBirthDate(parsedData); //setting birthdate instead because it makes sense.
             addUser.setRole(Role.USERS);
-            addUser.setVerificationCode(generateVerificationCode()); // by two methods the value is set for the user
+            addUser.setVerificationCode(generateCode()); // by two methods the value is set for the user
             addUser.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15)); // verificationcode should expire every 15 minutes.
             addUser.setEnabled(false);
             sendVerificationEmail(addUser); //sendVerification email is the method.
@@ -157,19 +163,38 @@ public class AuthService {
         }
     }
 
-    //Login Method
-    public UserEntity authenticate(LoginUserDTO loginUserDTO) {
+    //Login Method - and this should be set with the otp session now.
+
+    /*
+    Okay, IntelliJ is referring to that I should use SneakyThrows, where this gives me a possibility to throw exceptions without explicitly declaring them in my
+    method signature, as "throws theNameException"
+    I like this, but it bypasses the strict level of the java compiler, so I shouldn't practice this a lot... because of security measures.
+     */
+    @SneakyThrows
+    public String authenticate(LoginUserDTO loginUserDTO)  {
         Optional<UserEntity> authenticateUser = userRepository.findByEmail(loginUserDTO.getEmail()); //so i need to find it with optional first
 
         UserEntity user;
         if (authenticateUser.isPresent()) { //and then check if the user is present, when it is, check it for if it is enabled, but by this i need to create an new object where this is referred to the reference user
             user = authenticateUser.get();
+            System.out.println("Enabled: " + user.isEnabled());
             if (user.isEnabled()) { //here I check with the boolean statement in UserRepository if the email is verified, it has the String email stored as parameter
                 //We use this.authenticationManager and store this with a new value that has a new literal value of UsernamePassword and etc with the new values of the loginUserDTO values.
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginUserDTO.getEmail(), loginUserDTO.getPassword()));
-                return user; //IF THIS IS TRUE, I WANT TO RETURN IT HERE AND STOP THE CODE FROM GOING FURTHER ON THIS METHOD.
+
+                //Now the otp values should be set here after setting the new values to the instance
+                try {
+                    user.setOtpCode(generateCode());
+                    user.setOtpExpiresAt(LocalDateTime.now().plusMinutes(5)); //I want the code to be valid for 5 minutes
+                    userRepository.save(user);
+                    sendOneTimePasswordEmail(user);
+                } catch (AuthenticationFailedException e) {
+                    throw new AuthenticationFailedException("*CRUCIAL: OTP authentication IS not working*",e);
+                }
+                return "OTP sent to your email"; //IF THIS IS TRUE, I WANT TO RETURN IT HERE AND STOP THE CODE FROM GOING FURTHER ON THIS METHOD.
             } else {
-                throw new RuntimeException("Account not verified. Please verify your account");
+                throw new AccountStatusException("Account not verified. Please verify your account") {
+                };
             }
         } else {
             throw new RuntimeException("Check authenticate, there are no authentication going on Login in AuthService." + authenticateUser);
@@ -210,7 +235,7 @@ public class AuthService {
             if(userRepository.isEnabled(user.getEmail())) {
                 throw new RuntimeException("Account is already registered and verified.");
             }
-            user.setVerificationCode(generateVerificationCode());
+            user.setVerificationCode(generateCode());
             user.setVerificationCodeExpiresAt(LocalDateTime.now().plusHours(1));
             sendVerificationEmail(user);
         }
@@ -243,13 +268,80 @@ public class AuthService {
         }
     }
 
+    //This method should be where this actually check for if the oneTimePassword is still available
+    public UserEntity checkOneTimePassword(UserDTO userDTO, String email) throws AccountNotFoundException {
+
+        //I check if there are any user that is registered already with the current email
+        Optional <UserEntity> userCheck = userRepository.findByEmail(email);
+
+        //if the user is present
+        if(userCheck.isPresent() && userRepository.isEnabled(userDTO.getEmail())) {
+            //I want to store this user in a new variable where I can check if this user has confirmed their verification already,
+            //If not, the user should not get access to login.
+            UserEntity userOtp = userCheck.get();
+
+            //If the users verifcationcode is befre the local time that is now, in other words the one that got sent is not available anymore
+            if(userOtp.getOtpExpiresAt().isBefore(LocalDateTime.now())) {
+
+                //I want to throw an exception on it, where this explicitly tells the user that the password is expired/Denied
+                throw new SessionAuthenticationException("Expired OTP code, request a new one");
+            }
+
+            //If the otp is not expired, I should check that the OtpCode that has been sent, is the otp code that is supposed to verify the user's login method.
+            //so the other object i am comparing to should be equals in terms object similarity, since they are represented in Strings.
+            if(userOtp.getOtpCode().equals(userDTO.getOtpCode())) {
+                userOtp.setEnabled(true);
+                userOtp.setOtpCode(null);
+                userOtp.setOtpExpiresAt(null);
+                userRepository.save(userOtp);
+
+                //I want to return this so the user get's authenticated
+                return userOtp;
+            } else {
+                //Because this should show an invalid state of authenticating, where this
+                // will show with a proper message to user
+                throw new IllegalStateException("Invalid code");
+            }
+            // I think it is important to have an else if statement with an inverted logic to check if the user is not enabled by verification
+            //so it throw an exception to AccessDenied
+        } else if (!userRepository.isEnabled(userDTO.getEmail())) {
+            throw new AccessDeniedException("User is not verified - cannot log in with OTP!");
+
+        } else { //I also want to throw an exception if the user does NOT EXIST AT ALL.
+            throw new AccountNotFoundException("You do not have an registered account, please register an account first.");
+        }
+    }
+
+    //Here should the new method for OneTimePassword be for authentication.
+    private void sendOneTimePasswordEmail(UserEntity user) throws MessagingException{
+        String subject = "Login OTP Password";
+        String loginCode = "Login Code: " + user.getOtpCode();
+        String htmlMessage = "<html>"
+                + "<body style=\"font-family: Arial, sans-serif;\">"
+                + "<div style=\"background-color: #f5f5f5; padding: 20px;\">"
+                + "<h2 style=\"color: #333;\">Welcome to genetiicz.no!</h2>"
+                + "<p style=\"font-size: 16px;\">Please enter the verification code below to continue:</p>"
+                + "<div style=\"background-color: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">"
+                + "<h3 style=\"color: #333;\">Verification Code:</h3>"
+                + "<p style=\"font-size: 18px; font-weight: bold; color: #007bff;\">" + loginCode + "</p>"
+                + "</div>"
+                + "</div>"
+                + "</body>"
+                + "</html>";
+
+        try { //so with the build up, we set the emailService, where gets the javamail sender to run.
+            //with the correct parameters such as from, to, subject and the message itself.
+            emailService.sendOneTimePasswordEmail(emailUsername,user.getEmail(),subject,htmlMessage);
+        } catch (MessagingException messagingException) {
+            throw new MessagingException("The javaMailSender for otp verification does not work properly.",messagingException);
+        }
+    }
 
 
-    //The method that explicitly generate the verification code
-    private String generateVerificationCode() {
+    //The method that explicitly generate code, this will be now for verification but also user otp
+    private String generateCode() {
         Random random = new Random();
         int code = random.nextInt(900000) + 100000;
         return String.valueOf(code);
     }
-
 }

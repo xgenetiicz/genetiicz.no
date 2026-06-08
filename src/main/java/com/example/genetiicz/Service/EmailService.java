@@ -15,14 +15,6 @@ public class EmailService {
     private JavaMailSender javaMailSender;
 
     public void sendVerificationEmail(String from, String to, String subject, String text) throws MessagingException {
-
-         /*
-        I have problems with jakarta.mail cannot find or determine local email address?
-           https://stackoverflow.com/questions/34694468/failed-messages-javax-mail-messagingexception-cant-determine-local-email-addr
-           https://docs.spring.io/spring-framework/reference/integration/email.html#mail-javamail-mime #Using the JavaMail MimeMessageHelper
-
-           so the idea is that i use a MimeMessageHelper to determine and help to set the address..?
-         */
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message,true);
 
@@ -31,6 +23,29 @@ public class EmailService {
         helper.setSubject(subject);
         helper.setText(text,true);
 
+        javaMailSender.send(message);
+    }
+
+    public void sendOneTimePasswordEmail(String from, String to, String subject, String text) throws MessagingException {
+        /*
+        The next step with the javaMailSender is to send the actual otp code for authentication
+        https://docs.spring.io/spring-security/reference/servlet/authentication/onetimetoken.html this reference is goated.
+         */
+
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message,true);
+
+        helper.setFrom(from);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(text,true);
+
+        /*
+        so this message will be send now instead with an otp for authentication.
+        and I also need a message in the AuthService that explicitly does the business logic for checking if the verification code
+        is valid or invalid for the users session.
+
+         */
         javaMailSender.send(message);
     }
 }

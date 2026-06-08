@@ -61,4 +61,11 @@ public class UserEntity {
     @Column
     private LocalDateTime verificationCodeExpiresAt;
     private boolean enabled;
+
+    //I also need columns for userOTP (OneTimePassword)
+    @Column
+    private String otpCode;
+
+    @Column
+    private LocalDateTime otpExpiresAt;
 }
