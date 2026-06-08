@@ -38,4 +38,4 @@ Could be maybe something else in the future, but this is the plan for now.
 
 ## Author
 
-**Genti Rudi (xgenetiicz)** — Developer
+**Genti Rudi (xgenetiicz)** - Developer
