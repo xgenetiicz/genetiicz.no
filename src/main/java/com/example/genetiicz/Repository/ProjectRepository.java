@@ -2,6 +2,7 @@ package com.example.genetiicz.Repository;
 
 import com.example.genetiicz.Entity.ProjectEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,4 +20,10 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
     the userId is assigned to. Because each EMAIL is = unique. So one email can be part of a project.
      */
     List<ProjectEntity> findAllByUserEntity_Email(String email);
+
+    /*
+    Change of plans, I want to show userName instead of showcasing other's email in the url where this is sensitive information.
+    It does not make sense to leave it open there of course. lol.
+     */
+    List<ProjectEntity> findAllByUserEntity_UserName(String userName);
 }
