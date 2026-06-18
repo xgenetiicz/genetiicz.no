@@ -38,8 +38,8 @@ public class ProjectController {
     //This is the first time I am implementing a @GetMapping,but I want to validate it with @RequestParam
     //because this pass the email as query parameter to a dedicated validation endpoint that queries with the database
 
-    public ResponseEntity<List> getAllProjects(@RequestParam String email) throws AccountNotFoundException {
-        List<ProjectDTO> fetchedProjects = projectService.getAllProjects(email);
+    public ResponseEntity<List> getAllProjects(@RequestParam String userName) throws AccountNotFoundException {
+        List<ProjectDTO> fetchedProjects = projectService.getAllProjects(userName);
         if(fetchedProjects.isEmpty()) {
             return ResponseEntity.status(404).build();
         } else {

@@ -73,15 +73,18 @@ public class ProjectService {
         }
     }
 
-    //Now i want to feth all projects for myself, so i can display this later in a frontend page.
-    public List<ProjectDTO> getAllProjects(String email) throws AccountNotFoundException {
-        List<ProjectEntity> projectEntity = projectRepository.findAllByUserEntity_Email(email);
+    //Now i want to fetch all projects for myself, so i can display this later in a frontend page.
+    public List<ProjectDTO> getAllProjects(String userName) throws AccountNotFoundException {
+
+        //New Instance of list where we call on the repository to make the declarative query with JPA on userName instead.
+        List <ProjectEntity> getUserNameProjects = projectRepository.findAllByUserEntity_UserName(userName);
+
+        //List<ProjectEntity> projectEntity = projectRepository.findAllByUserEntity_Email(email);
 
         //I want to actually have this statement check with an inverted logic, if projectEntity is not Empty,
         //I want then to stream and map all the objects and place them In a new list with collection.
-        if(!projectEntity.isEmpty()) {
-            //so if the entity is NOT EMPTY, It should return a new list of map with collection of the new list
-            return projectEntity.stream().map(
+        if(!getUserNameProjects.isEmpty()) {
+            return getUserNameProjects.stream().map(
                             project -> {
                                 ProjectDTO projectDTO = new ProjectDTO();
                                 projectDTO.setProjectName(project.getProjectName());
@@ -90,8 +93,8 @@ public class ProjectService {
                                 return projectDTO;
                             }).collect(Collectors.toList());
         }
-        //I need to also check if the project list is actually empty,
-        boolean accountExists = userRepository.existsByEmail(email);
+        //I need to also check if the project list is actually empty, and i will check this by username instead since I don't compromize any email data.
+        boolean accountExists = userRepository.existsByUsername(userName);
 
         //then I want to throw the Exception State.
         if(!accountExists){
