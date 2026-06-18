@@ -55,6 +55,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         //Making changes to add ADMIN VERIFICATION if it is present so just I can add projects
                         .requestMatchers("/api/projects/addproject").hasAuthority(String.valueOf(Role.ADMIN))
+
+                        //Adding permitall on requestmatch for ("/api/projects/fetchProjects") this is so all can view the projects - It should not have any auth on it.
+                        .requestMatchers("/api/projects/fetchProjects").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
