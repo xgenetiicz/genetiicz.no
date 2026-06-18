@@ -48,6 +48,49 @@ public List<ProjectDTO> getAllProjects(String email) throws AccountNotFoundExcep
 }
 ````
 
+### **Changes to getAllProjects() method**
+
+```java
+  //Now i want to fetch all projects for myself, so i can display this later in a frontend page.
+    public List<ProjectDTO> getAllProjects(String userName) throws AccountNotFoundException {
+
+        //New Instance of list where we call on the repository to make the declarative query with JPA on userName instead.
+        List <ProjectEntity> getUserNameProjects = projectRepository.findAllByUserEntity_UserName(userName);
+
+        //List<ProjectEntity> projectEntity = projectRepository.findAllByUserEntity_Email(email);
+
+        //I want to actually have this statement check with an inverted logic, if projectEntity is not Empty,
+        //I want then to stream and map all the objects and place them In a new list with collection.
+        if(!getUserNameProjects.isEmpty()) {
+            return getUserNameProjects.stream().map(
+                            project -> {
+                                ProjectDTO projectDTO = new ProjectDTO();
+                                projectDTO.setProjectName(project.getProjectName());
+                                projectDTO.setProjectDescription(project.getProjectDescription());
+                                projectDTO.setProjectURL(project.getProjectURL());
+                                return projectDTO;
+                            }).collect(Collectors.toList());
+        }
+        //I need to also check if the project list is actually empty, and i will check this by username instead since I don't compromize any email data.
+        boolean accountExists = userRepository.existsByUsername(userName);
+
+        //then I want to throw the Exception State.
+        if(!accountExists){
+            throw new AccountNotFoundException("Did not find associated account for the projects.");
+            //else this user doesn't have any projects associated with the account
+        } else {
+            System.out.println("User has no projects available with the associated account");
+            //and the returned value of the else statement should include the Collection of the empty list.
+            return Collections.emptyList();
+        }
+    }
+```
+
+- The changes are to fetch this by the parameter (String userName) instead, since it doesn't make sense to expose email, where this is also an identificator to the user, and should remain private as of user's needs.
+- userName is a great way of finding me, or other users where this does not lack any sensitive information.
+- There has been changes to the declarative query also at the projectRepository such as findAllByUserEntity_userName.
+- This Query is based on the List of <ProjectEntity> where the users project are stored there.
+
 ## ProjectController
 **Updated to handle correct HTTP status:**
 - @GetMapping initalized
