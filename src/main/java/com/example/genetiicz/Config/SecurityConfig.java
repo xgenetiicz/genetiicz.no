@@ -56,6 +56,8 @@ public class SecurityConfig {
                         //Making changes to add ADMIN VERIFICATION if it is present so just I can add projects
                         .requestMatchers("/api/projects/addproject").hasAuthority(String.valueOf(Role.ADMIN))
 
+                        //Testing here for javacontact, but i think i will check this with authority as user have the role of user, where this is an authenticated user and not a bot spamming the email.
+                        .requestMatchers("/api/mail/contact").permitAll()
                         //Adding permitall on requestmatch for ("/api/projects/fetchProjects") this is so all can view the projects - It should not have any auth on it.
                         .requestMatchers("/api/projects/fetchProjects").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
