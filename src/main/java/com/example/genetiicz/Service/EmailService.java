@@ -84,9 +84,6 @@ public class EmailService {
         /*
         So google smtp mail ask for correct google account, since a mailbox needs always to have a mail to respond from.
         So I want to implement the actual business logic in here instead, since this doesn't require a user to be on an authenticated stage to send a contact schema.
-
-        TODO: i need to add an statement where the topic cannot be sent without being on the actual enum list, there is something wrong,
-         and it should only take out the elements from the enum list - and nothing else. **THE CASES**
          */
         message.setFrom(emailUsername); // this is the .env variable from the google smtp mail.
         message.setTo(destinationEmail); // the message with the topic should go to me, and the cases will switch based on picked topic and sent to myPersonalEmail, and stored in destinationEmail
