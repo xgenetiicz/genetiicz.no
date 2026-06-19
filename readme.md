@@ -10,6 +10,11 @@ The backend is a RESTful API built with Java and Spring Boot, designed around se
 - users can register, verify their email with a one-time code.
 - users can log in after validating otp token, and their email needs to be verified.
 - users gets issued a JWT token after successful validation on login with OTP.
+- Anyone can loop up a user's public project by username, without needing to be authenticated- this is meant to work like a public portfolio profile
+- Visitors can now reach out through a contact form. Messages are routed to either my personal email, or my business account inbox depending on the topic selected, using a reply to header, so I can respond directly to the sender.
+
+#### **BY FURTHER INTEREST ON IMPLEMENTATION:**
+Check out [Docs](Docs), where this explains progress more in depth for each feature.
 
 ## API Endpoints
 
@@ -19,6 +24,7 @@ The backend is a RESTful API built with Java and Spring Boot, designed around se
 - POST /api/auth/verify/otp - verify OTP, returns JWT
 - POST /api/projects/addproject - admin only, create project
 - GET  /api/projects/fetchProjects - get all projects by user
+- POST /api/mail/contact - public, send a message through contact form.
 
 Role-based access control separates what admins and regular users can do. 
 Only the admin can create and manage projects on the platform, for now.
@@ -39,8 +45,9 @@ Could be maybe something else in the future, but this is the plan for now.
 - Java 21 
 - Spring Boot,Spring Security + JWT Token Auth
 - BCrypt password hashing
-- Email verification via SMTP (Gmail) and Email One Time Password for Login with OTP code.
-- PostgreSQL + Docker
+- JavaMail (SMTP via Gmail)
+- Docker
+- PostgreSQL
 - Maven
 - Postman
 
@@ -49,4 +56,4 @@ Could be maybe something else in the future, but this is the plan for now.
 - Tailwind CSS
 
 ## Author
-**Genti Rudi (xgenetiicz)** - Developer
+**Genti Rudi (xgenetiicz)** - Java Developer
