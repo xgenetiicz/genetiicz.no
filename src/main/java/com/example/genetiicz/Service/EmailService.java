@@ -1,8 +1,12 @@
 package com.example.genetiicz.Service;
 
+import com.example.genetiicz.DTO.ContactFormDTO;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -10,6 +14,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EmailService {
+
+    //Value annotation here for receiving emails on the requested email for interests.
+    @Value("${MAIL_CONTACT}")
+    private String myPersonalEmail;
+
+    //Injecting .env values into application.yaml and adding the value here.
+    @Value("${MAIL_USERNAME}")
+    private String emailUsername;
 
     @Autowired
     private JavaMailSender javaMailSender;
@@ -47,5 +59,53 @@ public class EmailService {
 
          */
         javaMailSender.send(message);
+    }
+
+    public String contactFormWithTopic(ContactFormDTO contactFormDTO,String subject) throws MessagingException {
+        SimpleMailMessage message = new SimpleMailMessage();
+
+        //this is for debugging, but the values are added, checked at the terminal log.
+        // I will still keep this here for reassurance later if something bricks up.
+        if(getMyPersonalEmailAndOtherEmail().isBlank()) {
+            return getMyPersonalEmailAndOtherEmail();
+        }
+
+        //I declare this reference variable with a switch case that contains the literal values of contactForm.DTO, and also the literal value of enumerated list of contactTopic.
+        String destinationEmail = switch (contactFormDTO.contactTopic()) {
+            //so for each case, I want the user to pick the correct case, and then send the email from with the correct case.
+
+            // I think that the best way is to part them, one for tickets and requests, and other mail is for collab, ideas or other requests such as offers for example and et cetera.
+            case Collaboration,Ideas,Request-> myPersonalEmail.trim();
+            case Ticket, Issues -> emailUsername; //this is the email smtp is configured to
+        };
+
+        //Now I need to set message.set values for the requested ticket.
+
+        /*
+        So google smtp mail ask for correct google account, since a mailbox needs always to have a mail to respond from.
+        So I want to implement the actual business logic in here instead, since this doesn't require a user to be on an authenticated stage to send a contact schema.
+
+        TODO: i need to add an statement where the topic cannot be sent without being on the actual enum list, there is something wrong,
+         and it should only take out the elements from the enum list - and nothing else. **THE CASES**
+         */
+        message.setFrom(emailUsername); // this is the .env variable from the google smtp mail.
+        message.setTo(destinationEmail); // the message with the topic should go to me, and the cases will switch based on picked topic and sent to myPersonalEmail, and stored in destinationEmail
+        message.setReplyTo(contactFormDTO.email()); //the users dto email.
+        message.setSubject(String.valueOf(contactFormDTO.contactTopic())); //So the Subject is not longer 'subject' but it is the String value of the contactformDTO that has the literal topic chosen.
+        message.setText(contactFormDTO.message());
+
+        javaMailSender.send(message);
+        return destinationEmail;
+    }
+
+    //Method to help me find out why smtp is throwing off on simple message.
+    public String getMyPersonalEmailAndOtherEmail() throws MessagingException {
+        if(!myPersonalEmail.isBlank() || !emailUsername.isBlank()) {
+            System.out.println("The local email is added as: " + myPersonalEmail + "\nAnd also SMTP mail: " + emailUsername);
+        } else {
+            throw new MessagingException("The PERSONAL email address is not to be found!!");
+
+        }
+        return myPersonalEmail + "/" + emailUsername;
     }
 }
