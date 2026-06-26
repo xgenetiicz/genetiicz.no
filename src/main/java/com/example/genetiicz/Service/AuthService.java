@@ -1,6 +1,7 @@
 package com.example.genetiicz.Service;
 
 import com.example.genetiicz.DTO.LoginUserDTO;
+import com.example.genetiicz.DTO.ResetPasswordDTO;
 import com.example.genetiicz.DTO.UserDTO;
 import com.example.genetiicz.DTO.VerifyUserDto;
 import com.example.genetiicz.Entity.UserEntity;
@@ -8,13 +9,16 @@ import com.example.genetiicz.Enum.Role;
 import com.example.genetiicz.Repository.UserRepository;
 import jakarta.mail.AuthenticationFailedException;
 import jakarta.mail.MessagingException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.session.SessionAuthenticationException;
 import org.springframework.stereotype.Service;
@@ -25,6 +29,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.Random;
 
+@Slf4j
 @Service
 public class AuthService {
 
@@ -337,6 +342,69 @@ public class AuthService {
         }
     }
 
+    /*
+        Im going to reuse the sendVerificationEmail() method here but adapt it to sendPasswordResetEmail()
+     */
+    private void sendPasswordResetEmail(UserEntity user) { //TODO: Update with company logo
+        String subject = "Account Password Reset";
+        String resetPasswordCode = "RESET CODE: " + user.getOtpPassword();
+        String htmlMessage = "<html>"
+                + "<body style=\"font-family: Arial, sans-serif;\">"
+                + "<div style=\"background-color: #f5f5f5; padding: 20px;\">"
+                + "<h2 style=\"color: #333;\">Welcome to genetiicz.no!</h2>"
+                + "<p style=\"font-size: 16px;\">Please enter the reset code below to continue for changing password:</p>"
+                + "<div style=\"background-color: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">"
+                + "<h3 style=\"color: #333;\">Verification Code:</h3>"
+                + "<p style=\"font-size: 18px; font-weight: bold; color: #007bff;\">" + resetPasswordCode + "</p>"
+                + "</div>"
+                + "</div>"
+                + "</body>"
+                + "</html>";
+
+        try {
+            emailService.sendPasswordResetEmail(emailUsername,user.getEmail(), subject, htmlMessage); //I inject the fourth or first parameter with my emailUsername that contains the mail i am sending from.
+            // Because when i setFrom(from) helper with MimeMessageHelper, i need also a parameter here, and this method actually builds and send the verificationEmail. So I am explicitly telling
+            // that
+        } catch (MessagingException e) {
+            // Handle email sending exception
+            e.printStackTrace();
+        }
+    }
+
+    public String forgotPassword(String email) throws UsernameNotFoundException{
+        Optional<UserEntity> findUserByEmail =  userRepository.findByEmail(email);
+        UserEntity user;
+        if(findUserByEmail.isPresent()) {
+                user = findUserByEmail.get();
+                user.setOtpPassword(generateCode());
+                user.setOtpPasswordExpiresAt(LocalDateTime.now().plusMinutes(5));
+                userRepository.save(user);
+                sendPasswordResetEmail(user);
+        }
+        return "If an account exists for: " + email + ", a reset link has been sent.";
+    }
+
+    public String resetPassword(ResetPasswordDTO resetPasswordDTO) {
+        Optional<UserEntity> findUser = userRepository.findByEmail(resetPasswordDTO.email()); // referring to dto email
+
+        if(findUser.isPresent()) {
+            UserEntity user = findUser.get();
+            if(user.getOtpPasswordExpiresAt().isBefore(LocalDateTime.now())) {
+                throw new RuntimeException("Reset code has expired, request a new one");
+            }
+            if(user.getOtpPassword().equals(resetPasswordDTO.otpCode())){
+                user.setPassword(passwordEncoder.encode(resetPasswordDTO.password()));
+                user.setOtpPassword(null);
+                user.setOtpPasswordExpiresAt(null);
+                userRepository.save(user);
+                return "Password reset successfully";
+            } else {
+                throw new RuntimeException("Invalid reset code");
+            }
+        } else {
+         throw new RuntimeException("User not found");
+        }
+    }
 
     //The method that explicitly generate code, this will be now for verification but also user otp
     private String generateCode() {

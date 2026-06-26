@@ -1,10 +1,7 @@
 package com.example.genetiicz.Controller;
 
 
-import com.example.genetiicz.DTO.LoginResponseDTO;
-import com.example.genetiicz.DTO.LoginUserDTO;
-import com.example.genetiicz.DTO.UserDTO;
-import com.example.genetiicz.DTO.VerifyUserDto;
+import com.example.genetiicz.DTO.*;
 import com.example.genetiicz.Entity.UserEntity;
 import com.example.genetiicz.Service.AuthService;
 import com.example.genetiicz.Service.JwtService;
@@ -13,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.concurrent.locks.ReentrantLock;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -97,6 +95,21 @@ public class LoginController {
         }
     }
 
+    /*Controller method call for reset password, and I need two actually:
+    1. It should be where just a user types their email to get their otp code for changing password
+    2. the second should actually call the method to implement the logic of changing password.
+     */
+    @PostMapping("/forgot/password")
+    public ResponseEntity<String>forgotPassword(@RequestBody ForgotPasswordDTO forgotPasswordDTO) {
+        String messageToUser = authService.forgotPassword(forgotPasswordDTO.email());
+        return  ResponseEntity.ok(messageToUser);
+    }
+
+    @PostMapping("/reset/password")
+    public ResponseEntity<String>resetPassword(@Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
+        String messageToUser = authService.resetPassword(resetPasswordDTO);
+        return ResponseEntity.ok(messageToUser);
+    }
 
     /*
 

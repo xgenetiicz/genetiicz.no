@@ -10,6 +10,8 @@ public record ResetPasswordDTO(
         TODO: To UserEntity -> i think of this maybe that I don't want the same otp code to be rewritten for log in
         TODO: When user wants to log in after changing password.
          */
+        String email,
+        String otpCode,
 
         @NotBlank(message = "Please enter new password")
         String password,

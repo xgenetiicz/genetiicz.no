@@ -68,4 +68,11 @@ public class UserEntity {
 
     @Column
     private LocalDateTime otpExpiresAt;
+
+    //Columns for forgot passwordCodes, so I don't rewrite OTP codes that are for log in.
+    @Column
+    private String otpPassword;
+
+    @Column
+    private LocalDateTime otpPasswordExpiresAt;
 }
