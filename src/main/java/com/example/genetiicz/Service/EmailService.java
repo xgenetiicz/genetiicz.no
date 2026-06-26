@@ -1,6 +1,7 @@
 package com.example.genetiicz.Service;
 
 import com.example.genetiicz.DTO.ContactFormDTO;
+import com.example.genetiicz.DTO.ResetPasswordDTO;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,20 @@ public class EmailService {
         is valid or invalid for the users session.
 
          */
+        javaMailSender.send(message);
+    }
+
+
+    //So today i need to implement a mail method that sends the mail to the user after requesting to change password.
+    public void sendPasswordResetEmail (String from, String to,String subject, String text) throws MessagingException {
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message,true);
+
+        helper.setFrom(from);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(text,true);
+
         javaMailSender.send(message);
     }
 
