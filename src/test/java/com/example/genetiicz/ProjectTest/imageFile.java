@@ -53,7 +53,7 @@ public class imageFile {
 
         // I want to check for when the projectRepo is finding projectId, then it should check an optional maybe
         //if there is a photo from before?
-        when(projectRepository.findProjectByProjectIdAndUserId(123L,1L))
+        when(projectRepository.findProjectByProjectIdAndUserEntity_UserId(123L,1L))
                 .thenReturn(Optional.of(projectImage)); //The Id's are stored as LONG
 
         //So when the projectRepo finds it, we want to store the result in a String result = the actual service layer - business logic

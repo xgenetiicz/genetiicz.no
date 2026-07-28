@@ -55,6 +55,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         //Making changes to add ADMIN VERIFICATION if it is present so just I can add projects
                         .requestMatchers("/api/projects/addproject").hasAuthority(String.valueOf(Role.ADMIN))
+                        .requestMatchers("/api/projects/upload/image/**").authenticated() // so this is for checking real http server with authenticated users
 
                         //Testing here for javacontact, but i think i will check this with authority as user have the role of user, where this is an authenticated user and not a bot spamming the email.
                         .requestMatchers("/api/mail/contact","/api/auth/forgot/password").permitAll()
@@ -66,7 +67,10 @@ public class SecurityConfig {
                     .sessionManagement(session -> session
                             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // every request needs to be treated as a new one.
                     .authenticationProvider(authenticationProvider())
-                    .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                    .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                    .exceptionHandling(exception -> exception
+                            .authenticationEntryPoint(((request, response, authException) ->
+                                    response.sendError(401))));
         return http.build();
     }
 

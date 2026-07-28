@@ -138,10 +138,10 @@ public class ProjectService {
         it should add this to the project. So at the time the method addProject() is called, this method should also be called in
         when adding image file
          */
-        Optional<ProjectEntity> placeImageOnProject = projectRepository.findProjectByProjectIdAndUserId(projectId,userId);
+        Optional<ProjectEntity> placeImageOnProject = projectRepository.findProjectByProjectIdAndUserEntity_UserId(projectId,userId);
         if (placeImageOnProject.isPresent()) {
             ProjectEntity project = placeImageOnProject.get();
-            project.setImagePath("uploads/projects/" + filename); //filname contains UUID.randomUUID() + "_" imageUrlProject.getOriginalFileName
+            project.setImagePath("uploads/projects/" + filename); //filename contains UUID.randomUUID() + "_" imageUrlProject.getOriginalFileName
             projectRepository.save(project);
             return "uploads/projects/" + filename;
         }

@@ -14,7 +14,7 @@ public class ProjectEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // we want hibernate to actually count automatically on postgreSQL
-    private Long id;
+    private Long projectId;
 
     @Column
     private String projectName;
