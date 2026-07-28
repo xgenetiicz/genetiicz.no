@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
@@ -26,4 +27,11 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
     It does not make sense to leave it open there of course. lol.
      */
     List<ProjectEntity> findAllByUserEntity_UserName(String userName);
+
+    /*
+    So if the user have or does not have an project, there should be an optional value of it so the image that represents the value
+    of the page should be an object or null.
+     */
+
+    Optional <ProjectEntity>findProjectByProjectIdAndUserId(Long projectId,Long userId);
 }

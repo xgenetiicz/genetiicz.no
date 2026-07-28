@@ -7,21 +7,25 @@ import com.example.genetiicz.Entity.UserEntity;
 import com.example.genetiicz.Enum.Role;
 import com.example.genetiicz.Repository.ProjectRepository;
 import com.example.genetiicz.Repository.UserRepository;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import javax.management.relation.RoleNotFoundException;
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class ProjectService {
     private ProjectRepository projectRepository;
     private UserRepository userRepository;
+    private MultipartFile imageUrlProject;
 
     //Constructor example with autowired
 
@@ -105,5 +109,42 @@ public class ProjectService {
             //and the returned value of the else statement should include the Collection of the empty list.
             return Collections.emptyList();
         }
+    }
+
+    /*
+    So here is to add the business logic for the image file, the idea is to have this
+    in a folder on my raspberry, where these will be stored there and also called on
+    later when finding projectId, so one image should have a reference on projectId,
+    and a projectId have an reference to userId because of @ManyToOne
+     */
+
+    //And i want return the object to the user.
+    public String uploadProjectImage(Long projectId,Long userId, MultipartFile imageUrlProject ) throws FileUploadException { //one image to each projectId
+
+        //So i genereate first random unique filenames
+        String filename = UUID.randomUUID() + "_" + imageUrlProject.getOriginalFilename();
+
+        //Then i need to store those files physically
+        Path uploadPath = Paths.get("uploads/projects/");
+        try {
+            Files.createDirectories(uploadPath); //making dir for the actualpath where the files should be copied too.
+            Files.copy(imageUrlProject.getInputStream(),uploadPath.resolve(filename));
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot copy files and store these into uploadPath",e);
+        }
+        //The business logic and updating database
+        /*
+        So the logic should work in a way where when user create the project, and the user adds the desired image
+        it should add this to the project. So at the time the method addProject() is called, this method should also be called in
+        when adding image file
+         */
+        Optional<ProjectEntity> placeImageOnProject = projectRepository.findProjectByProjectIdAndUserId(projectId,userId);
+        if (placeImageOnProject.isPresent()) {
+            ProjectEntity project = placeImageOnProject.get();
+            project.setImagePath("uploads/projects/" + filename); //filname contains UUID.randomUUID() + "_" imageUrlProject.getOriginalFileName
+            projectRepository.save(project);
+            return "uploads/projects/" + filename;
+        }
+        throw new FileUploadException("The desired image is not uploaded. Please try again");
     }
 }

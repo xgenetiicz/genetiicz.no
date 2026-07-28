@@ -26,10 +26,14 @@ public class ProjectEntity {
     private String projectURL;
 
 
-    //Founnd out that hibernate cannot map multipartfile directly to a database columnn because it is a web interface
-    // not persistent data.
-    //@Column
-    //private MultipartFile projectFile;
+    //TODO:Change of plans:
+    /*
+    Instead of storing these into multiPartFile with Storage and cloud solutions and etc,
+    instead i am going to use a String imagePath, where these photos will be stored into a folder
+    on my own raspberry pi, and these
+     */
+    @Column
+    private String imagePath;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
