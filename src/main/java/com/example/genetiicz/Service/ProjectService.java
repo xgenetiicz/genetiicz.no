@@ -14,11 +14,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.management.relation.RoleNotFoundException;
 import javax.security.auth.login.AccountNotFoundException;
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -139,6 +141,8 @@ public class ProjectService {
         when adding image file
          */
         Optional<ProjectEntity> placeImageOnProject = projectRepository.findProjectByProjectIdAndUserEntity_UserId(projectId,userId);
+        System.out.println("Project found: " + placeImageOnProject.isPresent()); //need to see if it finds the project
+        System.out.println("projectId: " + projectId + "\nuserId: " + userId); // and the id of project and the user id pointed to projectId.
         if (placeImageOnProject.isPresent()) {
             ProjectEntity project = placeImageOnProject.get();
             project.setImagePath("uploads/projects/" + filename); //filename contains UUID.randomUUID() + "_" imageUrlProject.getOriginalFileName
